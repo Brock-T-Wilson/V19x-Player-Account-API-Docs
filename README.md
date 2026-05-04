@@ -474,6 +474,71 @@ Authorization: Bearer {access_token}
   }
 }
 ```
+## Error Handling
+
+The V19x Player Account API uses standard HTTP status codes to indicate success or failure of API requests.
+
+### Common Status Codes
+
+| Status Code | Description |
+|---|---|
+| 200 OK | The request was successful. |
+| 201 Created | A new resource was successfully created. |
+| 400 Bad Request | The request was invalid or malformed. |
+| 401 Unauthorized | Authentication is required or failed. |
+| 404 Not Found | The requested resource does not exist. |
+| 429 Too Many Requests | Rate limit exceeded. |
+
+### Error Response Format
+
+All error responses follow a consistent structure:
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Description of the error."
+  }
+}
+```
+
+**Example Error**
+
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Missing or invalid access token."
+  }
+}
+```
+
+## Rate Limiting
+
+To ensure system stability and prevent abuse, the V19x Player Account API enforces rate limits on incoming requests.
+
+### Limits
+
+- 100 requests per minute per user
+
+Rate limits are applied per authenticated user and reset every minute.
+
+
+### Exceeding Rate Limits
+
+If the rate limit is exceeded, the API returns:
+
+**429 Too Many Requests**
+
+```json
+{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests. Please try again later."
+  }
+}
+```
+
 
 
 
