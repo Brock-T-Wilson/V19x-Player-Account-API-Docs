@@ -66,3 +66,265 @@ Content-Type: application/json
 "email": "player@v19x.com",
 "password": "SecurePass123!"
 }
+```
+
+**Response**
+
+200 OK
+```JSON
+{
+"access_token": "v19x_access_abc123",
+"refresh_token": "v19x_refresh_xyz789",
+"token_type": "Bearer",
+"expires_in": 3600,
+"user": {
+"id": "user_001",
+"gamertag": "V19xPlayer01"
+  }
+}
+```
+
+**Error Response**
+
+401 Unauthorized
+```JSON
+{
+"error": {
+"code": "UNAUTHORIZED",
+"message": "Invalid email or password."
+  }
+}
+```
+## POST /users
+
+Creates a new player account.
+
+### Request
+
+**URL**
+
+POST /users
+
+**Headers**
+
+Content-Type: application/json
+
+**Body**
+
+```json
+{
+"email": "player@v19x.com",
+"gamertag": "V19xPlayer01",
+"password": "SecurePass123!"
+}
+```
+
+**Response**
+
+201 Created
+
+```json
+{
+"id": "user_001",
+"email": "player@v19x.com",
+"gamertag": "V19xPlayer01",
+"account_status": "active",
+"created_at": "2026-05-03T14:00:00Z"
+}
+```
+
+**Error Response**
+
+400 Bad Request
+
+```json
+{
+"error": {
+"code": "BAD_REQUEST",
+"message": "Invalid input data."
+  }
+}
+```
+
+## GET /users/{userId}
+
+Retrieves a player account by user ID.
+
+### Request
+
+**URL**
+
+GET /users/user_001
+
+**Headers**
+
+Authorization: Bearer {access_token}
+
+### Response
+
+200 OK
+
+```json
+{
+"id": "user_001",
+"email": "player@v19x.com",
+"gamertag": "V19xPlayer01",
+"account_status": "active",
+"created_at": "2026-05-03T14:00:00Z"
+}
+```
+
+**Error Response**
+
+404 Not Found
+
+```json
+{
+"error": {
+"code": "NOT_FOUND",
+"message": "User not found."
+  }
+}
+```
+
+## DELETE /users/{userId}
+
+Deactivates a player account by user ID.
+
+### Request
+
+**URL**
+
+DELETE /users/{userId}
+
+**Example**
+
+DELETE /users/user_001
+
+**Headers**
+
+Authorization: Bearer {access_token}
+
+### Response
+
+200 OK
+
+```json
+{
+"message": "User account deactivated successfully.",
+"user_id": "user_001"
+}
+```
+
+**Error Response**
+
+```json
+{
+"error": {
+"code": "NOT_FOUND",
+"message": "User not found."
+  }
+}
+```
+
+## POST /auth/refresh-token
+
+Generates a new access token using a valid refresh token.
+
+### Request
+
+**URL**
+
+POST /auth/refresh-token
+
+**Headers**
+
+Content-Type: application/json
+
+**Body**
+
+```json
+{
+"refresh_token": "v19x_refresh_xyz789"
+}
+```
+
+**Response**
+
+200 OK
+
+```json
+{
+"access_token": "v19_access_new456",
+"token_type": "Bearer",
+"expires_in": 3600
+}
+```
+
+**Error Response**
+
+```json
+{
+"error": {
+"code": "UNAUTHORIZED",
+"message": "Invalid or expired refresh token."
+  }
+}
+```
+
+## POST /users/{userId}/mfa/enable
+
+Enables multi-factor authentication for a player account.
+
+### Request
+
+**URL**
+
+POST /users/{userId}/mfa/enable
+
+**Example**
+
+POST /users/user_001/mfa/enable
+
+**Headers**
+
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+**Body**
+
+```json
+{
+"method": "authenticator_app",
+}
+```
+
+**Response**
+
+200 OK
+
+```json
+{
+"mfa_enabled": true,
+"method": "authenticator_app",
+"recovery_codes": [
+"V19X-94KD-21LA",
+"V19X-83JS-10QP"
+  ]
+}
+```
+
+**Error Response**
+
+401 Unauthorized
+
+```json
+{
+"error": {
+"code": "UNAUTHORIZED",
+"message": "Missing or invalid access token.'
+  }
+}
+```
+
+
