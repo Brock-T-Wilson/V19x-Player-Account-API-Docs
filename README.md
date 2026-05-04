@@ -73,13 +73,13 @@ Content-Type: application/json
 200 OK
 ```JSON
 {
-"access_token": "v19x_access_abc123",
-"refresh_token": "v19x_refresh_xyz789",
-"token_type": "Bearer",
-"expires_in": 3600,
-"user": {
-"id": "user_001",
-"gamertag": "V19xPlayer01"
+  "access_token": "v19x_access_abc123",
+  "refresh_token": "v19x_refresh_xyz789",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "user": {
+    "id": "user_001",
+    "gamertag": "V19xPlayer01"
   }
 }
 ```
@@ -89,9 +89,9 @@ Content-Type: application/json
 401 Unauthorized
 ```JSON
 {
-"error": {
-"code": "UNAUTHORIZED",
-"message": "Invalid email or password."
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid email or password."
   }
 }
 ```
@@ -125,11 +125,11 @@ Content-Type: application/json
 
 ```json
 {
-"id": "user_001",
-"email": "player@v19x.com",
-"gamertag": "V19xPlayer01",
-"account_status": "active",
-"created_at": "2026-05-03T14:00:00Z"
+  "id": "user_001",
+  "email": "player@v19x.com",
+  "gamertag": "V19xPlayer01",
+  "account_status": "active",
+  "created_at": "2026-05-03T14:00:00Z"
 }
 ```
 
@@ -139,9 +139,9 @@ Content-Type: application/json
 
 ```json
 {
-"error": {
-"code": "BAD_REQUEST",
-"message": "Invalid input data."
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Invalid input data."
   }
 }
 ```
@@ -180,9 +180,9 @@ Authorization: Bearer {access_token}
 
 ```json
 {
-"error": {
-"code": "NOT_FOUND",
-"message": "User not found."
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "User not found."
   }
 }
 ```
@@ -220,9 +220,9 @@ Authorization: Bearer {access_token}
 
 ```json
 {
-"error": {
-"code": "NOT_FOUND",
-"message": "User not found."
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "User not found."
   }
 }
 ```
@@ -255,19 +255,21 @@ Content-Type: application/json
 
 ```json
 {
-"access_token": "v19_access_new456",
-"token_type": "Bearer",
-"expires_in": 3600
+  "access_token": "v19x_access_new456",
+  "token_type": "Bearer",
+  "expires_in": 3600
 }
 ```
 
 **Error Response**
 
+401 Unauthorized
+
 ```json
 {
-"error": {
-"code": "UNAUTHORIZED",
-"message": "Invalid or expired refresh token."
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid or expired refresh token."
   }
 }
 ```
@@ -305,11 +307,11 @@ Content-Type: application/json
 
 ```json
 {
-"mfa_enabled": true,
-"method": "authenticator_app",
-"recovery_codes": [
-"V19X-94KD-21LA",
-"V19X-83JS-10QP"
+  "mfa_enabled": true,
+  "method": "authenticator_app",
+  "recovery_codes": [
+    "V19X-94KD-21LA",
+    "V19X-83JS-10QP"
   ]
 }
 ```
@@ -320,11 +322,162 @@ Content-Type: application/json
 
 ```json
 {
-"error": {
-"code": "UNAUTHORIZED",
-"message": "Missing or invalid access token.'
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Missing or invalid access token."
   }
 }
 ```
+## GET /users/{userId}/sessions
+
+Lists active sessions for a player account.
+
+### Request
+
+**URL**
+
+GET /users/{userId}/sessions
+
+**Example**
+
+GET /users/user_001/sessions
+
+**Headers**
+
+Authorization: Bearer {access_token}
+
+### Response
+
+200 OK
+
+```json
+{
+  "user_id": "user_001",
+  "events": [
+    {
+      "event_id": "evt_001",
+      "type": "login_success",
+      "ip_address": "192.0.2.10",
+      "device": "V19x Console",
+      "created_at": "2026-05-03T13:45:00Z"
+    },
+    {
+      "event_id": "evt_002",
+      "type": "mfa_enabled",
+      "ip_address": "192.0.2.11",
+      "device": "Mobile App",
+      "created_at": "2026-05-03T14:15:00Z"
+    }
+  ]
+}
+```
+
+**Error Response**
+
+401 Unauthorized
+
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Missing or invalid access token."
+  }
+}
+```
+
+## GET /users/{userId}/sessions
+
+Lists active sessions for a player account.
+
+### Request
+
+**URL**  
+GET /users/{userId}/sessions
+
+**Example**  
+GET /users/user_001/sessions
+
+**Headers**  
+Authorization: Bearer {access_token}
+
+### Response
+
+200 OK
+
+```json
+{
+  "user_id": "user_001",
+  "sessions": [
+    {
+      "session_id": "sess_12345",
+      "device": "V19x Console",
+      "location": "United States",
+      "last_active": "2026-05-03T13:55:00Z"
+    },
+    {
+      "session_id": "sess_67890",
+      "device": "Mobile App",
+      "location": "United States",
+      "last_active": "2026-05-03T14:05:00Z"
+    }
+  ]
+}
+```
+**Error Response**
+
+401 Unauthorized
+
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Missing or invalid access token."
+  }
+}
+```
+
+## DELETE /users/{userId}/sessions/{sessionId}
+
+Revokes an active session for a player account.
+
+### Request
+
+**URL**  
+DELETE /users/{userId}/sessions/{sessionId}
+
+**Example**  
+DELETE /users/user_001/sessions/sess_12345
+
+**Headers**  
+Authorization: Bearer {access_token}
+
+### Response
+
+200 OK
+
+```json
+{
+  "message": "Session revoked successfully.",
+  "session_id": "sess_12345"
+}
+```
+
+**Error Response**
+
+401 Unauthorized
+
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Missing or invalid access token."
+  }
+}
+```
+
+
+
+
+
 
 
