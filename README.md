@@ -1,5 +1,9 @@
 # V19x Player Account API Documentation 
 
+![API](https://img.shields.io/badge/API-REST-blue)
+![Docs](https://img.shields.io/badge/Docs-Complete-brightgreen)
+
+
 The V19x Player Account API is a mock REST API designed to manage player accounts, authentication, session handling, and security features for a gaming platform.
 
 This API simulates real-world account and identity systems used in modern gaming services. It includes endpoints for user creation, authentication, multi-factor authentication (MFA), session management, and security event tracking.
