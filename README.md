@@ -736,6 +736,10 @@ DELETE /users/{userId}/sessions/{sessionId}
 Allows viewing and revoking active sessions.
 
 
+## Additional Resources
+
+- [Troubleshooting Guide](docs/troubleshooting.md)
+
 ## Version
 
 v1.0
