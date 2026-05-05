@@ -4,10 +4,45 @@ The V19x Player Account API is a mock REST API designed to manage player account
 
 This API simulates real-world account and identity systems used in modern gaming services. It includes endpoints for user creation, authentication, multi-factor authentication (MFA), session management, and security event tracking.
 
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Authentication](#authentication)
+- [Authentication Flow](#authentication-flow)
+- [Token Lifecycle](#token-lifecycle)
+- [Endpoints Overview](#endpoints-overview)
+- [POST /auth/login](#post-authlogin)
+- [POST /users](#post-users)
+- [GET /users/{userId}](#get-usersuserid)
+- [DELETE /users/{userId}](#delete-usersuserid)
+- [POST /auth/refresh-token](#post-authrefresh-token)
+- [POST /users/{userId}/mfa/enable](#post-usersuseridmfaenable)
+- [GET /users/{userId}/security-events](#get-security-events)
+- [GET /users/{userId}/sessions](#get-usersuseridsessions)
+- [DELETE /users/{userId}/sessions/{sessionId}](#delete-usersuseridsessionssessionid)
+- [Data Models](#data-models)
+- [Error Handling](#error-handling)
+- [Rate Limiting](#rate-limiting)
+- [Example Workflow](#example-workflow)
+
 ## Base URL
 
 Production (example):
 https://api.v19x.com
+
+## Quick Start
+
+### 1. Log in
+
+POST /auth/login
+
+### 2. Use your access token
+
+Authorization: Bearer {access_token}
+
+### 3. Make an authenticated request
+
+GET /users/{userId}
 
 ## Authentication
 
@@ -16,7 +51,68 @@ The V19x Player Account API uses Bearer Token authentication for secured endpoin
 ### Authorization Header
 
 All protected endpoints require the following header:
-Authorization: Bearer {access_token} 
+Authorization: Bearer {access_token}
+
+## Authentication Flow
+
+The V19x Player Account API uses a token-based authentication system to secure protected endpoints.
+
+### Step 1: User Login
+
+The user submits their credentials to the login endpoint:
+
+POST /auth/login
+
+The API validates the credentials and returns:
+
+- access_token
+- refresh_token
+- expires_in
+
+### Step 2: Use Access Token
+
+The access token must be included in all protected requests using the Authorization header:
+
+Authorization: Bearer {access_token}
+
+### Step 3: Access Protected Endpoints
+
+Once authenticated, the access token can be used to interact with secured endpoints such as:
+
+- GET /users/{userId}
+- GET /users/{userId}/sessions
+- POST /users/{userId}/mfa/enable
+
+### Step 4: Refresh Token
+
+When the access token expires, a new token can be obtained using:
+
+POST /auth/refresh-token
+
+This allows continued access without requiring the user to log in again.
+
+## Token Lifecycle
+
+Access tokens are short-lived and used to authenticate API requests.
+
+### Access Token
+
+- Issued during login (`POST /auth/login`)
+- Used to authorize requests to protected endpoints
+- Expires after a set duration (`expires_in`)
+
+### Refresh Token
+
+- Issued alongside the access token
+- Used to obtain a new access token without re-authentication
+
+### Token Renewal Flow
+
+1. User logs in and receives access and refresh tokens  
+2. Access token is used for API requests  
+3. Access token expires  
+4. Refresh token is used to generate a new access token (`POST /auth/refresh-token`)
+ 
 
 ### Example
 
@@ -66,6 +162,17 @@ Content-Type: application/json
 "email": "player@v19x.com",
 "password": "SecurePass123!"
 }
+```
+
+### Example Request
+
+```bash
+curl -X POST "{{baseUrl}}/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "player@v19x.com",
+    "password": "SecurePass123!"
+  }'
 ```
 
 **Response**
@@ -156,9 +263,14 @@ Retrieves a player account by user ID.
 
 GET /users/user_001
 
+**Path Parameters**
+
+- userId (string): Unique identifier for the user
+
 **Headers**
 
-Authorization: Bearer {access_token}
+Authorization: Bearer {access_token}  
+Content-Type: application/json
 
 ### Response
 
@@ -203,7 +315,8 @@ DELETE /users/user_001
 
 **Headers**
 
-Authorization: Bearer {access_token}
+Authorization: Bearer {access_token}  
+Content-Type: application/json
 
 ### Response
 
@@ -344,7 +457,8 @@ GET /users/user_001/sessions
 
 **Headers**
 
-Authorization: Bearer {access_token}
+Authorization: Bearer {access_token}  
+Content-Type: application/json
 
 ### Response
 
@@ -385,7 +499,8 @@ Authorization: Bearer {access_token}
 }
 ```
 
-## GET /users/{userId}/sessions
+<a id="get-security-events"></a>
+## GET /users/{userId}/security-events
 
 Lists active sessions for a player account.
 
@@ -398,7 +513,9 @@ GET /users/{userId}/sessions
 GET /users/user_001/sessions
 
 **Headers**  
-Authorization: Bearer {access_token}
+
+Authorization: Bearer {access_token}  
+Content-Type: application/json
 
 ### Response
 
@@ -448,8 +565,15 @@ DELETE /users/{userId}/sessions/{sessionId}
 **Example**  
 DELETE /users/user_001/sessions/sess_12345
 
+**Path Parameters**
+
+- userId (string): Unique identifier for the user  
+- sessionId (string): Unique identifier for the session
+
 **Headers**  
-Authorization: Bearer {access_token}
+
+Authorization: Bearer {access_token}  
+Content-Type: application/json
 
 ### Response
 
@@ -474,6 +598,23 @@ Authorization: Bearer {access_token}
   }
 }
 ```
+
+## Data Models
+
+### User
+
+Represents a player account in the V19x system.
+
+```json
+{
+  "id": "user_001",
+  "email": "player@v19x.com",
+  "gamertag": "V19xPlayer01",
+  "account_status": "active",
+  "created_at": "2026-05-03T14:00:00Z"
+}
+```
+
 ## Error Handling
 
 The V19x Player Account API uses standard HTTP status codes to indicate success or failure of API requests.
@@ -539,10 +680,63 @@ If the rate limit is exceeded, the API returns:
 }
 ```
 
+## Example Workflow
+
+The following example demonstrates a typical flow for using the V19x Player Account API.
+
+### 1. Create a User
+
+POST /users
+
+Creates a new player account.
+
+---
+
+### 2. Authenticate User
+
+POST /auth/login
+
+Returns an access token and refresh token.
+
+---
+
+### 3. Access Protected Data
+
+GET /users/{userId}
+
+Uses the access token to retrieve account details.
+
+---
+
+### 4. Enable Multi-Factor Authentication
+
+POST /users/{userId}/mfa/enable
+
+Adds an extra layer of security to the account.
+
+---
+
+### 5. View Security Events
+
+GET /users/{userId}/security-events
+
+Displays recent account activity.
+
+---
+
+### 6. Manage Sessions
+
+GET /users/{userId}/sessions  
+DELETE /users/{userId}/sessions/{sessionId}
+
+Allows viewing and revoking active sessions.
 
 
+## Version
 
+v1.0
 
+_Last updated: May 2026_
 
 
 
