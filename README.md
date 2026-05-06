@@ -143,9 +143,9 @@ The response will include:
 | GET | `/users/{userId}` | Retrieves a player account by user ID. |
 | DELETE | `/users/{userId}` | Deactivates a player account. | 
 | POST | `/auth/refresh-token` | Issues a new access token using a refresh token. |
-| POST | `/users/{userId}/mfa/enable` | Enables mutli-factor authentication for a user. |
+| POST | `/users/{userId}/mfa/enable` | Enables multi-factor authentication for a user. |
 | GET | `/users/{userId}/security-events` | Retrieves recent security events for a user. |
-| GET | `/users{userId}/sessions` | Lists active sessions for a user. |
+| GET | `/users/{userId}/sessions` | Lists active sessions for a user. |
 | DELETE | `/users/{userId}/sessions/{sessionId}` | Revokes a specific user session. |
 
 ## POST /auth/login
@@ -414,7 +414,7 @@ Content-Type: application/json
 
 ```json
 {
-"method": "authenticator_app",
+"method": "authenticator_app"
 }
 ```
 
@@ -506,15 +506,15 @@ Content-Type: application/json
 <a id="get-security-events"></a>
 ## GET /users/{userId}/security-events
 
-Lists active sessions for a player account.
+
 
 ### Request
 
 **URL**  
-GET /users/{userId}/sessions
+GET /users/{userId}/security-events
 
 **Example**  
-GET /users/user_001/sessions
+GET /users/user_001/security-events
 
 **Headers**  
 
@@ -526,23 +526,8 @@ Content-Type: application/json
 200 OK
 
 ```json
-{
-  "user_id": "user_001",
-  "sessions": [
-    {
-      "session_id": "sess_12345",
-      "device": "V19x Console",
-      "location": "United States",
-      "last_active": "2026-05-03T13:55:00Z"
-    },
-    {
-      "session_id": "sess_67890",
-      "device": "Mobile App",
-      "location": "United States",
-      "last_active": "2026-05-03T14:05:00Z"
-    }
-  ]
-}
+
+
 ```
 **Error Response**
 
