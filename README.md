@@ -471,20 +471,18 @@ Content-Type: application/json
 ```json
 {
   "user_id": "user_001",
-  "events": [
+  "sessions": [
     {
-      "event_id": "evt_001",
-      "type": "login_success",
-      "ip_address": "192.0.2.10",
+      "session_id": "sess_12345",
       "device": "V19x Console",
-      "created_at": "2026-05-03T13:45:00Z"
+      "location": "United States",
+      "last_active": "2026-05-03T13:55:00Z"
     },
     {
-      "event_id": "evt_002",
-      "type": "mfa_enabled",
-      "ip_address": "192.0.2.11",
+      "session_id": "sess_67890",
       "device": "Mobile App",
-      "created_at": "2026-05-03T14:15:00Z"
+      "location": "United States",
+      "last_active": "2026-05-03T14:05:00Z"
     }
   ]
 }
@@ -506,7 +504,7 @@ Content-Type: application/json
 <a id="get-security-events"></a>
 ## GET /users/{userId}/security-events
 
-
+Retrieves recent security events for a user.
 
 ### Request
 
@@ -526,7 +524,25 @@ Content-Type: application/json
 200 OK
 
 ```json
-
+{
+  "user_id": "user_001",
+  "events": [
+    {
+      "event_id": "evt_001",
+      "type": "login_success",
+      "ip_address": "192.0.2.10",
+      "device": "V19x Console",
+      "created_at": "2026-05-03T13:45:00Z"
+    },
+    {
+      "event_id": "evt_002",
+      "type": "mfa_enabled",
+      "ip_address": "192.0.2.11",
+      "device": "Mobile App",
+      "created_at": "2026-05-03T14:15:00Z"
+    }
+  ]
+}
 
 ```
 **Error Response**
