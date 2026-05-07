@@ -7,7 +7,7 @@
 The V19x Player Account API is a mock REST API designed to manage player accounts, authentication, session handling, and security features for a gaming platform.
 
 This API simulates real-world account and identity systems used in modern gaming services. It includes endpoints for user creation, authentication, multi-factor authentication (MFA), session management, and security event tracking.
-
+---
 ## Table of Contents
 
 - [Quick Start](#quick-start)
@@ -28,7 +28,7 @@ This API simulates real-world account and identity systems used in modern gaming
 - [Error Handling](#error-handling)
 - [Rate Limiting](#rate-limiting)
 - [Example Workflow](#example-workflow)
-
+---
 ## Base URL
 
 Production (example):
@@ -133,7 +133,7 @@ The response will include:
 - access_token
 - refresh_token
 - expires_in
-
+---
 ## Endpoints Overview
 
 | Method | Endpoint | Description |
@@ -230,6 +230,18 @@ Content-Type: application/json
 }
 ```
 
+### Example Request
+
+```bash
+curl -X POST "{{baseUrl}}/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "player@v19x.com",
+    "gamertag": "V19xPlayer01",
+    "password": "SecurePass123!"
+  }'
+```
+
 **Response**
 
 201 Created
@@ -276,6 +288,14 @@ GET /users/user_001
 Authorization: Bearer {access_token}  
 Content-Type: application/json
 
+### Example Request
+
+```bash
+curl -X GET "{{baseUrl}}/users/user_001" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json"
+```
+
 ### Response
 
 200 OK
@@ -317,6 +337,10 @@ DELETE /users/{userId}
 
 DELETE /users/user_001
 
+**Path Parameters**
+
+- userId (string): Unique identifier for the user
+
 **Headers**
 
 Authorization: Bearer {access_token}  
@@ -333,7 +357,9 @@ Content-Type: application/json
 }
 ```
 
-**Error Response**
+### Error Response
+
+**404 Not Found**
 
 ```json
 {
@@ -364,6 +390,15 @@ Content-Type: application/json
 {
 "refresh_token": "v19x_refresh_xyz789"
 }
+```
+### Example Request
+
+```bash
+curl -X POST "{{baseUrl}}/auth/refresh-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh_token": "v19x_refresh_xyz789"
+  }'
 ```
 
 **Response**
@@ -418,6 +453,22 @@ Content-Type: application/json
 }
 ```
 
+**Valid MFA Methods**
+
+- `authenticator_app`
+- `sms`
+- `email`
+
+### Example Request
+
+```bash
+curl -X POST "{{baseUrl}}/users/user_001/mfa/enable" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "authenticator_app"
+  }'
+```
 **Response**
 
 200 OK
@@ -457,7 +508,15 @@ GET /users/{userId}/sessions
 
 **Example**
 
-GET /users/user_001/sessions
+GET /users/user_001/sessions?limit=5
+
+**Path Parameters**
+
+- userId (string): Unique identifier for the user
+
+**Query Parameters**
+
+- limit (integer): Number of sessions returned
 
 **Headers**
 
@@ -487,7 +546,22 @@ Content-Type: application/json
   ]
 }
 ```
+### Limited Response Example
 
+```json
+{
+  "user_id": "user_001",
+  "limit": 5,
+  "sessions": [
+    {
+      "session_id": "sess_12345",
+      "device": "V19x Console",
+      "location": "United States",
+      "last_active": "2026-05-03T13:55:00Z"
+    }
+  ]
+}
+```
 **Error Response**
 
 401 Unauthorized
@@ -500,7 +574,18 @@ Content-Type: application/json
   }
 }
 ```
+### Additional Error Response
 
+**404 Not Found**
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "No active sessions found for the specified user."
+  }
+}
+
+```
 <a id="get-security-events"></a>
 ## GET /users/{userId}/security-events
 
@@ -512,7 +597,16 @@ Retrieves recent security events for a user.
 GET /users/{userId}/security-events
 
 **Example**  
-GET /users/user_001/security-events
+GET /users/user_001/security-events?limit=10&offset=0
+
+**Path Parameters**
+
+- userId (string): Unique identifier for the user
+
+**Query Parameters**
+
+- limit (integer): Number of events returned per request  
+- offset (integer): Number of events to skip before returning results
 
 **Headers**  
 
@@ -540,6 +634,26 @@ Content-Type: application/json
       "ip_address": "192.0.2.11",
       "device": "Mobile App",
       "created_at": "2026-05-03T14:15:00Z"
+    }
+  ]
+}
+
+```
+
+### Paginated Response Example
+```json
+{
+  "user_id": "user_001",
+  "limit": 10,
+  "offset": 0,
+  "total_events": 24,
+  "events": [
+    {
+      "event_id": "evt_001",
+      "type": "login_success",
+      "ip_address": "192.0.2.10",
+      "device": "V19x Console",
+      "created_at": "2026-05-03T13:45:00Z"
     }
   ]
 }
@@ -604,6 +718,18 @@ Content-Type: application/json
 }
 ```
 
+### Additional Error Response
+
+**404 Not Found**
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Session not found."
+  }
+}
+```
+---
 ## Data Models
 
 ### User
@@ -619,6 +745,40 @@ Represents a player account in the V19x system.
   "created_at": "2026-05-03T14:00:00Z"
 }
 ```
+
+## Field-Level Details
+
+### User Fields
+
+| Field | Type | Required | Description | Constraints |
+|---|---|---|---|---|
+| id | string | Yes | Unique user identifier | Must use `user_` prefix |
+| email | string | Yes | User email address | Must be a valid email format |
+| gamertag | string | Yes | Public player display name | 3–20 characters; letters, numbers, and underscores only |
+| password | string | Yes | User account password | Minimum 8 characters; must include one uppercase letter, one number, and one special character |
+| account_status | string | Yes | Current account state | Valid values: `active`, `deactivated`, `locked` |
+| created_at | string | Yes | Account creation timestamp | ISO 8601 format |
+
+---
+
+### MFA Fields
+
+| Field | Type | Required | Description | Constraints |
+|---|---|---|---|---|
+| method | string | Yes | MFA method used for account protection | Valid values: `authenticator_app`, `sms`, `email` |
+| mfa_enabled | boolean | Yes | Indicates whether MFA is enabled | `true` or `false` |
+| recovery_codes | array | Yes | Backup codes used for account recovery | Returned only when MFA is enabled |
+
+---
+
+### Session Fields
+
+| Field | Type | Required | Description | Constraints |
+|---|---|---|---|---|
+| session_id | string | Yes | Unique session identifier | Must use `sess_` prefix |
+| device | string | Yes | Device used for the session | Example: `V19x Console`, `Mobile App` |
+| location | string | Yes | Approximate session location | Country or region name |
+| last_active | string | Yes | Last activity timestamp | ISO 8601 format |
 
 ## Error Handling
 
@@ -648,7 +808,19 @@ All error responses follow a consistent structure:
 }
 ```
 
-**Example Error**
+### Example Errors
+
+**400 Bad Request**
+
+```json
+{
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Invalid request data."
+  }
+}
+```
+**401 Unauthorized**
 
 ```json
 {
@@ -658,7 +830,25 @@ All error responses follow a consistent structure:
   }
 }
 ```
+**404 Not Found**
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Requested resource not found."
+  }
+}
+```
+**429 Too Many Requests**
 
+```json
+{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests. Please try again later."
+  }
+}
+```
 ## Rate Limiting
 
 To ensure system stability and prevent abuse, the V19x Player Account API enforces rate limits on incoming requests.
@@ -736,6 +926,7 @@ DELETE /users/{userId}/sessions/{sessionId}
 
 Allows viewing and revoking active sessions.
 
+---
 
 ## Additional Resources
 
